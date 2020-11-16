@@ -1,39 +1,35 @@
 package Logic;
 
+import java.util.ArrayList;
+
 public class Map {
-    Tile[][] tiles;
+    private int width;
+    private int height;
+    private ArrayList<Tile> tiles = new ArrayList<>();
 
     public Map(int width, int height) {
-        tiles = new Tile[height][width];
+        this.width = width;
+        this.height = height;
         fillMapWithWalls();
     }
 
     private void fillMapWithWalls(){
-        int rowNr = 0;
-        for(Tile[] row : tiles){
-            int tileNr = 0;
-            for(Tile tile : row){
-                tiles[rowNr][tileNr] = new Tile(TileType.Wall);
-                tileNr++;
+        for (int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                tiles.add(new Tile(TileType.Wall, x, y));
             }
-            rowNr++;
         }
     }
 
-    public String[][] getDisplayMap(){
-        int height = tiles.length;
-        int width = tiles[0].length;
-        String[][] results = new String[height][width];
-        int rowNr = 0;
-        for(Tile[] row : tiles){
-            int tileNr = 0;
-            for(Tile tile : row){
-                results[rowNr][tileNr] = Helper.getIconFromTileType(tiles[rowNr][tileNr].getType());
-                tileNr++;
-            }
-            rowNr++;
-        }
+    public ArrayList<Tile> getTiles(){
+        return tiles;
+    }
 
-        return results;
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

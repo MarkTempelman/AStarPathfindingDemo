@@ -21,6 +21,14 @@ public class Map {
         }
     }
 
+    public void setTile(int x, int y, TileType type){
+        Tile currentTileOnCoordinates = tiles.stream().filter(tile -> tile.getYPos() == y && tile.getXPos() == x).findFirst().orElse(null);
+        if(currentTileOnCoordinates != null){
+            tiles.remove(currentTileOnCoordinates);
+        }
+        tiles.add(new Tile(type, x, y));
+    }
+
     public ArrayList<Tile> getTiles(){
         return tiles;
     }

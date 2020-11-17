@@ -11,6 +11,8 @@ public class Helper {
                 return "o";
             case Wall:
                 return "x";
+            case Path:
+                return "+";
         }
         return null;
     }

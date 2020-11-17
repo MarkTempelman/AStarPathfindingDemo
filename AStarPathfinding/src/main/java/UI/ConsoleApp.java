@@ -1,16 +1,24 @@
 package UI;
 
-import Logic.Helper;
-import Logic.Map;
-import Logic.Tile;
+import Logic.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class ConsoleApp {
-    private static Map map = new Map(5,3);
+    private static Map map = new Map(3,3);
+    private static Pathfinder pathfinder = new Pathfinder();
     public static void main(String[] args) {
+        map.setTile(0, 0, TileType.Start);
+        map.setTile(2, 2, TileType.End);
+        ArrayList<Tile> tiles = map.getTiles();
+        System.out.println("Map:");
+        printTiles(tiles, map.getWidth(), map.getHeight());
+        for (Tile tile: pathfinder.generatePath(tiles)) {
+            map.setTile(tile.getXPos(), tile.getYPos(), TileType.Path);
+        }
+        System.out.println("Path:");
         printTiles(map.getTiles(), map.getWidth(), map.getHeight());
     }
 

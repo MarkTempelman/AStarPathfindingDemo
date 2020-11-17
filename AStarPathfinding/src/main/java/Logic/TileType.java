@@ -5,4 +5,5 @@ public enum TileType {
     End,
     Empty,
     Wall,
+    Path,
 }

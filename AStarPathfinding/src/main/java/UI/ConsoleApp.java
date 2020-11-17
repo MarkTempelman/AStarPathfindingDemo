@@ -7,11 +7,15 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class ConsoleApp {
-    private static Map map = new Map(3,3);
+    private static Map map = new Map(5,5);
     private static Pathfinder pathfinder = new Pathfinder();
     public static void main(String[] args) {
         map.setTile(0, 0, TileType.Start);
-        map.setTile(2, 2, TileType.End);
+        map.setTile(4, 4, TileType.End);
+        map.setTile(0, 1, TileType.Wall);
+        map.setTile(1, 1, TileType.Wall);
+        map.setTile(3, 0, TileType.Wall);
+        map.setTile(3, 1, TileType.Wall);
         ArrayList<Tile> tiles = map.getTiles();
         System.out.println("Map:");
         printTiles(tiles, map.getWidth(), map.getHeight());

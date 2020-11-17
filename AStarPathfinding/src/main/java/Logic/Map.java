@@ -10,13 +10,13 @@ public class Map {
     public Map(int width, int height) {
         this.width = width;
         this.height = height;
-        fillMapWithWalls();
+        fillMapWithEmpty();
     }
 
-    private void fillMapWithWalls(){
+    private void fillMapWithEmpty(){
         for (int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                tiles.add(new Tile(TileType.Wall, x, y));
+                tiles.add(new Tile(TileType.Empty, x, y));
             }
         }
     }

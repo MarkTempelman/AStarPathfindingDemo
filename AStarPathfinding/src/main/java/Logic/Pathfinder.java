@@ -37,29 +37,31 @@ public class Pathfinder {
 
             for (Tile neighbour: neighbouringTiles) {
                 int cost = currentTile.getTotalCost() + 1;
+                if(neighbour.getType() != TileType.Wall){
+                    Tile otherTile = openTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
+                    if(otherTile != null && otherTile.getDistanceFromStart() > cost){
+                        openTiles.remove(otherTile);
+                    }
 
-                Tile otherTile = openTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
-                if(otherTile != null && otherTile.getDistanceFromStart() > cost){
-                    openTiles.remove(otherTile);
-                }
 
-                otherTile = closedTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
-                if(otherTile != null && otherTile.getDistanceFromStart() > cost){
-                    closedTiles.remove(otherTile);
-                }
 
-                if(!openTiles.stream().anyMatch(t -> t.equals(neighbour)) && !closedTiles.stream().anyMatch(t -> t.equals(neighbour))){
-                    neighbour.setDistanceFromStart(cost);
-                    neighbour.setTotalCost(cost + getDistanceToEnd(neighbour));
-                    neighbour.setParent(currentTile);
-                    openTiles.add(neighbour);
+                    otherTile = closedTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
+                    if(otherTile != null && otherTile.getDistanceFromStart() > cost){
+                        closedTiles.remove(otherTile);
+                    }
+
+                    if(!openTiles.stream().anyMatch(t -> t.equals(neighbour)) && !closedTiles.stream().anyMatch(t -> t.equals(neighbour))){
+                        neighbour.setDistanceFromStart(cost);
+                        neighbour.setTotalCost(cost + getDistanceToEnd(neighbour));
+                        neighbour.setParent(currentTile);
+                        openTiles.add(neighbour);
+                    }
                 }
             }
         }
 
         addEndToPath();
         addOthersToPath();
-
         return path;
     }
 
@@ -133,10 +135,7 @@ public class Pathfinder {
         }
     }
 
-
     private int getDistanceToEnd(Tile currentTile){
         return Math.abs(currentTile.getXPos() - endX) + Math.abs(currentTile.getYPos() - endY);
     }
-
-    //http://theory.stanford.edu/~amitp/GameProgramming/ImplementationNotes.html
 }

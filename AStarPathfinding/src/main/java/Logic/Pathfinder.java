@@ -1,5 +1,7 @@
 package Logic;
 
+import UI.ConsoleApp;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -11,8 +13,10 @@ public class Pathfinder {
     private ArrayList<Tile> path = new ArrayList<>();
     private int endX;
     private int endY;
+    private TimeStamp timeStamp = new TimeStamp();
 
     public ArrayList<Tile> generatePath(ArrayList<Tile> tiles){
+
         allTiles = tiles;
         if(!tilesAreValid()){
             return null;
@@ -20,6 +24,8 @@ public class Pathfinder {
         initializeOpenList();
         setEndCoordinates();
 
+        timeStamp.init();
+        timeStamp.setBegin();
         while(openTiles.size() > 0){
 
             Tile currentTile = openTiles.stream().min(Comparator.comparing(Tile::getTotalCost)).orElse(null);
@@ -43,6 +49,8 @@ public class Pathfinder {
                 tryAddNeighbourToOpenTiles(neighbour, cost, currentTile);
             }
         }
+        timeStamp.setEnd();
+        ConsoleApp.printMessage(timeStamp.toString());
 
         addEndToPath();
         addOthersToPath();

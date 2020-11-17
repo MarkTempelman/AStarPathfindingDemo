@@ -37,26 +37,12 @@ public class Pathfinder {
 
             for (Tile neighbour: neighbouringTiles) {
                 int cost = currentTile.getTotalCost() + 1;
-                if(neighbour.getType() != TileType.Wall){
-                    Tile otherTile = openTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
-                    if(otherTile != null && otherTile.getDistanceFromStart() > cost){
-                        openTiles.remove(otherTile);
-                    }
-
-
-
-                    otherTile = closedTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
-                    if(otherTile != null && otherTile.getDistanceFromStart() > cost){
-                        closedTiles.remove(otherTile);
-                    }
-
-                    if(!openTiles.stream().anyMatch(t -> t.equals(neighbour)) && !closedTiles.stream().anyMatch(t -> t.equals(neighbour))){
-                        neighbour.setDistanceFromStart(cost);
-                        neighbour.setTotalCost(cost + getDistanceToEnd(neighbour));
-                        neighbour.setParent(currentTile);
-                        openTiles.add(neighbour);
-                    }
+                if(neighbour.getType() == TileType.Wall){
+                    continue;
                 }
+                removeTileFromOpenTilesIfNecessary(neighbour, cost);
+                removeTileFromClosedTilesIfNecessary(neighbour, cost);
+                tryAddNeighbourToOpenTiles(neighbour, cost, currentTile);
             }
         }
 
@@ -65,11 +51,38 @@ public class Pathfinder {
         return path;
     }
 
-    public void addEndToPath(){
+    private void removeTileFromOpenTilesIfNecessary(Tile neighbour, int cost){
+        Tile otherTile = openTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
+        if(otherTile != null && otherTile.getDistanceFromStart() > cost){
+            openTiles.remove(otherTile);
+        }
+    }
+
+    private void removeTileFromClosedTilesIfNecessary(Tile neighbour, int cost){
+        Tile otherTile = closedTiles.stream().filter(t -> t.equals(neighbour)).findFirst().orElse(null);
+        if(otherTile != null && otherTile.getDistanceFromStart() > cost){
+            closedTiles.remove(otherTile);
+        }
+    }
+
+    private void tryAddNeighbourToOpenTiles(Tile neighbour, int cost, Tile currentTile){
+        if(!openTiles.stream().anyMatch(t -> t.equals(neighbour)) && !closedTiles.stream().anyMatch(t -> t.equals(neighbour))){
+            setNeighbourVariables(neighbour, cost, currentTile);
+            openTiles.add(neighbour);
+        }
+    }
+
+    private void setNeighbourVariables(Tile neighbour, int cost, Tile parent){
+        neighbour.setDistanceFromStart(cost);
+        neighbour.setTotalCost(cost + getDistanceToEnd(neighbour));
+        neighbour.setParent(parent);
+    }
+
+    private void addEndToPath(){
         path.add(openTiles.stream().filter(tile -> tile.getType() == TileType.End).findFirst().orElse(null));
     }
 
-    public void addOthersToPath(){
+    private void addOthersToPath(){
         Tile tileToAdd = path.get(path.size() - 1).getParent();
         path.add(tileToAdd);
         if(tileToAdd.getParent() != null){
@@ -78,8 +91,9 @@ public class Pathfinder {
     }
 
     private boolean tilesAreValid(){
-        return allTiles.stream().anyMatch(tile -> tile.getType() == TileType.Start) &&
-                allTiles.stream().anyMatch(tile -> tile.getType() == TileType.End);
+        return allTiles.stream().filter(tile -> tile.getType() == TileType.Start).collect(Collectors.toList()).toArray().length == 1 &&
+                allTiles.stream().filter(tile -> tile.getType() == TileType.End).collect(Collectors.toList()).toArray().length == 1;
+
     }
 
     private Tile getStartNode(){
@@ -100,36 +114,15 @@ public class Pathfinder {
 
     private ArrayList<Tile> getNeighbouringTiles(Tile tile){
         ArrayList<Tile> tiles = new ArrayList<>();
-        addLeftNeighbour(tiles, tile);
-        addRightNeighbour(tiles, tile);
-        addTopNeighbour(tiles, tile);
-        addBottomNeighbour(tiles, tile);
+        addNeighbour(tiles, tile, 1, 0);
+        addNeighbour(tiles, tile, -1, 0);
+        addNeighbour(tiles, tile, 0, 1);
+        addNeighbour(tiles, tile, 0, -1);
         return tiles;
     }
 
-    private void addLeftNeighbour(ArrayList<Tile> tiles, Tile tile){
-        Tile currentTile = allTiles.stream().filter(t -> t.getXPos() == tile.getXPos() - 1 && t.getYPos() == tile.getYPos()).findFirst().orElse(null);
-        if(currentTile != null){
-            tiles.add(currentTile);
-        }
-    }
-
-    private void addRightNeighbour(ArrayList<Tile> tiles, Tile tile){
-        Tile currentTile = allTiles.stream().filter(t -> t.getXPos() == tile.getXPos() + 1 && t.getYPos() == tile.getYPos()).findFirst().orElse(null);
-        if(currentTile != null){
-            tiles.add(currentTile);
-        }
-    }
-
-    private void addTopNeighbour(ArrayList<Tile> tiles, Tile tile){
-        Tile currentTile = allTiles.stream().filter(t -> t.getXPos() == tile.getXPos() && t.getYPos() == tile.getYPos() - 1).findFirst().orElse(null);
-        if(currentTile != null){
-            tiles.add(currentTile);
-        }
-    }
-
-    private void addBottomNeighbour(ArrayList<Tile> tiles, Tile tile){
-        Tile currentTile = allTiles.stream().filter(t -> t.getXPos() == tile.getXPos() && t.getYPos() == tile.getYPos() + 1).findFirst().orElse(null);
+    private void addNeighbour(ArrayList<Tile> tiles, Tile tile, int xModifier, int yModifier){
+        Tile currentTile = allTiles.stream().filter(t -> t.getXPos() == tile.getXPos() + xModifier && t.getYPos() == tile.getYPos() + yModifier).findFirst().orElse(null);
         if(currentTile != null){
             tiles.add(currentTile);
         }
